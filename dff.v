@@ -5,11 +5,11 @@ module dff (
   output reg q
 );
 
-always @ (posedge clk) begin
+always @ (posedge clk or posedge reset) begin
   if(!reset)
-    q <= 0;
+    q <= d;
   else
-    q <= d; 
+    q <= 0; 
 end
 
   
