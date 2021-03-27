@@ -1,11 +1,11 @@
-SOURCES =  $(wildcard *.v)
+SOURCES = testbench.v #$(wildcard *.v)
 SIMFILE = main.vcd
 
 
 .PHONY : build
 build : $(SOURCES)
 	iverilog -o ./build/main.out $^
-	vvp ./build/main.out
+	vvp ./build/main.out 
 
 .PHONY : sim
 sim :	$(SOURCES)
