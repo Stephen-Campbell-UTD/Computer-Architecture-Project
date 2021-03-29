@@ -1,4 +1,4 @@
-module ram (
+module RAM (
     address,
     isReading,
     clk,

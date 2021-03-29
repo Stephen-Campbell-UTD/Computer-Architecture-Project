@@ -6,19 +6,19 @@
     {
       "label": "default build",
       "type": "shell",
-      "command": "make",
+      "command": "cd \"${relativeFileDirname}\"; make",
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "presentation": {
-        "echo": true,
-        "reveal": "never",
-        "focus": false,
-        "panel": "dedicated",
-        "showReuseMessage": true,
-        "clear": false
-      }
+      // "presentation": {
+      //   "echo": true,
+      //   "reveal": "never",
+      //   "focus": false,
+      //   "panel": "dedicated",
+      //   "showReuseMessage": true,
+      //   "clear": false
+      // }
     },
   ]
 }

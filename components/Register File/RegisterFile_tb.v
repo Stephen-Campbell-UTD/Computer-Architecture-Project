@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
-`include "./ram.v"
+`include "./RegisterFile.v"
+
 module testbench ();
 
   reg clk;
@@ -59,7 +60,7 @@ module testbench ();
   // always #5 clk = !clk;
 
   // dff flip (.d(sig),.clk(clk),.reset(resetSIG), .q(qout));
-  ram mem (
+  RAM mem (
       .address(address),
       .isReading(isReading),
       .clk(clk),

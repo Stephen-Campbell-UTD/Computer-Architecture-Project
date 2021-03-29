@@ -1,19 +1,20 @@
-SOURCES = testbench.v #$(wildcard *.v)
+SOURCES = $(wildcard *tb.v)
 SIMFILE = main.vcd
 
 
-.PHONY : build
-build : $(SOURCES)
+resim : $(SOURCES) build
 	iverilog -o ./build/main.out $^
 	vvp ./build/main.out 
 
 .PHONY : sim
-sim :	$(SOURCES)
+sim :	$(SOURCES) build
 	iverilog -o ./build/main.out $^
 	vvp ./build/main.out
 	gtkwave ./build/$(SIMFILE)
 
-.PHONY : clean
-clean : 
+.PHONY : clean 
+clean : build
 	rm ./build/*
 
+build: 
+	mkdir build
