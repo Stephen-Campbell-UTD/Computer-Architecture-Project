@@ -1,20 +1,28 @@
 module ram (
-    input [10:0] address,
-    input isReading,
-    input clk,
-    inout [0:63] data
+    address,
+    isReading,
+    clk,
+    data
 );
-  integer i;
+  parameter ADDRESS_SIZE = 11;
+  parameter MEM_DEPTH = 2 ** ADDRESS_SIZE;
+  parameter MEM_WORD_SIZE = 64;
 
-  // NUM_ADDRESS x DATA_BUS_WIDTH bits 
-  reg [0:63] ram_memory[2047:0];
-  reg [0:63] data_private;
+  input [ADDRESS_SIZE-1:0] address;
+  input isReading;
+  input clk;
+  inout [MEM_WORD_SIZE-1:0] data;
 
-  initial begin
-    for (i = 0; i < 2048; i = i + 1) begin
-      ram_memory[i] = 64'b0;
+  // NUM_ADDRESS x DATA_BUS_WIDTH bits
+  reg [MEM_WORD_SIZE-1:0] ram_memory[MEM_DEPTH-1:0];
+  reg [MEM_WORD_SIZE-1:0] data_private;
+
+  initial begin : mem_initialization
+    integer i;
+    for (i = 0; i < MEM_DEPTH; i = i + 1) begin
+      ram_memory[i] = {MEM_WORD_SIZE{1'b0}};
     end
-    data_private = 64'b0;
+    data_private = {MEM_WORD_SIZE{1'b0}};
   end
 
   always @(posedge clk) begin
@@ -22,6 +30,6 @@ module ram (
     else ram_memory[address] <= data;
   end
 
-  assign data = (isReading ? data_private : 64'bZ);
+  assign data = (isReading ? data_private : {MEM_WORD_SIZE{1'bZ}});
 
 endmodule

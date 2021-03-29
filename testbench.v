@@ -21,18 +21,18 @@ module testbench ();
   end
   initial begin
     // Initialize Inputs
-    address = 0;
+    address   = 0;
     isReading = 0;
-    clk = 0;
-    driver = 0;
+    clk       = 0;
+    driver    = 0;
     // Wait 100 ns for global reset to finish
     #100;
 
     // Now perform a write at address
     for (c = 0; c <= 1; c = c + 1) begin
-      clk <= c;
+      clk     <= c;
       address <= 11'd1024;
-      driver <= 64'hff03;
+      driver  <= 64'hff04;
       isReading = 0;
       #100;
     end
@@ -41,14 +41,14 @@ module testbench ();
 
     // Reads Data from the address right before the one we want
     for (c = 0; c <= 5; c = c + 1) begin
-      clk <= c;
+      clk     <= c;
       address <= 11'd1023;
       #100;
     end
 
     // Now perform a read on the address we wrote too
     for (c = 0; c <= 1; c = c + 1) begin
-      clk <= c;
+      clk     <= c;
       address <= 11'd1024;
       #100;
     end
