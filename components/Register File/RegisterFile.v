@@ -1,39 +1,43 @@
 module RegisterFile (
-    selA,
-    selB,
-    selWrite,
-    writeIn,
-    isReading,
-    clk,
-    outA,
-    outB
+    input [REG_ADDRESS_SIZE-1:0] selA,
+    input [REG_ADDRESS_SIZE-1:0] selB,
+    input [REG_ADDRESS_SIZE-1:0] selWrite,
+    input [MEM_WORD_SIZE-1:0] writeIn,
+    input isReading,
+    input clk,
+    output reg [MEM_WORD_SIZE-1:0] outA,
+    output reg [MEM_WORD_SIZE-1:0] outB
 );
 
-  //Parameters and Ports
+  //Parameters 
   parameter REG_ADDRESS_SIZE = 2;
   parameter NUM_REG = 2 ** REG_ADDRESS_SIZE;
   parameter MEM_WORD_SIZE = 64;
 
-  input [REG_ADDRESS_SIZE-1:0] selA;
-  input [REG_ADDRESS_SIZE-1:0] selB;
-  input [REG_ADDRESS_SIZE-1:0] selWrite;
-  input [MEM_WORD_SIZE-1:0] writeIn;
-  input isReading;
-  input clk;
-  output [MEM_WORD_SIZE-1:0] outA;
-  output [MEM_WORD_SIZE-1:0] outB;
 
   //Logic
 
   reg [MEM_WORD_SIZE-1:0] registers[NUM_REG-1:0];
-  assign outA = registers[selA];
 
+  always @(posedge clk) begin
+    if (isReading) begin  
+      outA <= registers[selA];
+      outB <= registers[selB];
+    end else begin //writing
+      registers[selWrite] <= writeIn;
+    end
+  end
+
+
+
+  //Sim
   initial begin : initialization
-  integer i;
-    for(i = 0; i < NUM_REG; i = i+1) begin
+    integer i;
+    for (i = 0; i < NUM_REG; i = i + 1) begin
       registers[i] = {MEM_WORD_SIZE{1'b0}};
     end
-    registers[2'b00] = {32{2'b10}};
+      outA <= {MEM_WORD_SIZE{1'b0}};
+      outB <= {MEM_WORD_SIZE{1'b0}};
   end
 
 
