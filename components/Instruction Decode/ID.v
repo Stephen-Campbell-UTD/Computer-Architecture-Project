@@ -13,7 +13,7 @@ module InstructionDecode (
   parameter REG_ADDRESS_SIZE = 2;
   parameter SMALL_IMMEDIATE_SIZE = 10;
   parameter BIG_IMMEDIATE_SIZE = 12;
-  parameter JUMP_ADDRESS_SIZE = 11;
+  parameter JUMP_ADDRESS_SIZE = 9;  //left shifted twice
 
 
   //opcode decode
@@ -29,7 +29,7 @@ module InstructionDecode (
   //immediate decode
   assign smImm = instruction[SMALL_IMMEDIATE_SIZE-1:0];
   assign bgImm = instruction[BIG_IMMEDIATE_SIZE-1:0];
-  assign jumpAddress = instruction[JUMP_ADDRESS_SIZE+2:3];
+  assign jumpAddress = instruction[OP_LSB-1:OP_LSB-1-JUMP_ADDRESS_SIZE];
 
 
   // Instruction format 1: 3 Registers Selections -> Data computation 
@@ -40,6 +40,10 @@ module InstructionDecode (
   // Instruction format 2: 2 Register Selections -> 
   // ALU R I Type / Branch  / Load / Store
   // ASSEMBLY: add rAlpha, rBeta imm  ; rAlpha = rBeta + imm ;
+  // ASSEMBLY: branch  rAlpha == rBeta  offset  ; 
+  // A==B ->PC=PC+SignExtended(offset<<2) ;
+  // ASSEMBLY: load rAlpha, rBeta[imm]  ; A = MEM[B + SignExtended(imm)]
+  // ASSEMBLY: store rAlpha, rBeta[imm]  ; MEM[B + SignExtended(imm)] = A
   // opcode | rAlpha  | rBeta  | immediate/offset (small)  
   //   6    |    2    |    2   |   10     
 
@@ -51,7 +55,7 @@ module InstructionDecode (
   // Instruction format 3: No Register Selection -> Jump
   // ASSEMBLY: jump addr;
   // opcode |  jumpAddress | unused
-  //   6    |      11      |    3
+  //   6    |       9      |    3
 
 
 
