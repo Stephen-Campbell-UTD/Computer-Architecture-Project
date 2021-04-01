@@ -1,82 +1,59 @@
+`include "./ControlStates.v"
 `include "../../multicycle/opcodes.v"
 module Control (
     input [5:0] opcode,
     input clk,
-    output reg pcWrite,
-    output reg pcWriteCond,
-    output reg memGetData,  //(I or D)
-    output reg memRead,
-    output reg regWriteDataSelect,  //(memToReg)
-    output reg irWrite,
-    output reg regWrite,
-    output reg aluSrcA,
-    output reg [1:0] aluSrcB,
-    output reg [1:0] pcSrc
+    //12 states -> 4 bits
+    output reg [3:0] state
 );
 
-  //12 states -> 4 bits
-  parameter INSTRUCTION_FETCH = 4'd0;
-  parameter REGISTER_FETCH = 4'd1;
-  parameter IMMEDIATE_INJECTION2 = 4'd2;
-  parameter ALU_R3 = 4'd3;
-  parameter ALU_RI3 = 4'd4;
-  parameter ALU4 = 4'd5;
-  parameter BRANCH3 = 4'd6;
-  parameter MEMORY_REF3 = 4'd7;
-  parameter LOAD4 = 4'd8;
-  parameter STORE4 = 4'd9;
-  parameter LOAD5 = 4'd10;
-  parameter JUMP3 = 4'd11;
 
-  reg [3:0] state;
   initial begin
-    state <= INSTRUCTION_FETCH;
+    state <= CS.INSTRUCTION_FETCH;
   end
 
   always @(posedge clk) begin
     case (state)
-      INSTRUCTION_FETCH: begin
+      CS.INSTRUCTION_FETCH: begin
         case (opcode)
-          OP.LDI:  state <= IMMEDIATE_INJECTION2;
-          default: state <= REGISTER_FETCH;
+          OP.LDI:  state <= CS.IMMEDIATE_INJECTION2;
+          default: state <= CS.REGISTER_FETCH;
         endcase
       end
-      REGISTER_FETCH: begin
+      CS.REGISTER_FETCH: begin
         casez (opcode[5:3])
-          {OP.ALU_R_HEADER, 1'b?} : state <= ALU_R3;
-          {OP.ALU_RI_HEADER, 1'b?} : state <= ALU_RI3;
-          OP.BRANCH_HEADER: state <= BRANCH3;
-          OP.MEMORY_REF_HEADER: state <= MEMORY_REF3;
-          OP.JUMP[5:3]: state <= JUMP3;
+          {OP.ALU_R_HEADER, 1'b?} : state <= CS.ALU_R3;
+          {OP.ALU_RI_HEADER, 1'b?} : state <= CS.ALU_RI3;
+          OP.BRANCH_HEADER: state <= CS.BRANCH3;
+          OP.MEMORY_REF_HEADER: state <= CS.MEMORY_REF3;
+          OP.JUMP[5:3]: state <= CS.JUMP3;
           default: begin
             $display("Somehow ended up at Register Fetch with bad opcode header");
           end
         endcase
       end
-      IMMEDIATE_INJECTION2: state <= INSTRUCTION_FETCH;
-      ALU_R3: state <= ALU4;
-      ALU_RI3: state <= ALU4;
-      ALU4: state <= INSTRUCTION_FETCH;
-      BRANCH3: state <= INSTRUCTION_FETCH;
-      MEMORY_REF3: begin
+      CS.IMMEDIATE_INJECTION2: state <= CS.INSTRUCTION_FETCH;
+      CS.ALU_R3: state <= CS.ALU4;
+      CS.ALU_RI3: state <= CS.ALU4;
+      CS.ALU4: state <= CS.INSTRUCTION_FETCH;
+      CS.BRANCH3: state <= CS.INSTRUCTION_FETCH;
+      CS.MEMORY_REF3: begin
         case (opcode[2])
-          OP.LD[2]:  state <= LOAD4;
-          OP.STR[2]: state <= STORE4;
+          OP.LD[2]:  state <= CS.LOAD4;
+          OP.STR[2]: state <= CS.STORE4;
           default: begin
             $display("Somehow ended up at Register Fetch with bad opcode header");
           end
         endcase
       end
-      LOAD4: state <= LOAD5;
-      STORE4: state <= INSTRUCTION_FETCH;
-      LOAD5: state <= INSTRUCTION_FETCH;
-      JUMP3: state <= INSTRUCTION_FETCH;
+      CS.LOAD4: state <= CS.LOAD5;
+      CS.STORE4: state <= CS.INSTRUCTION_FETCH;
+      CS.LOAD5: state <= CS.INSTRUCTION_FETCH;
+      CS.JUMP3: state <= CS.INSTRUCTION_FETCH;
       default: begin
         $display("Somehow arrived at invalid control state");
       end
     endcase
   end
-
-
 
 endmodule

@@ -6,23 +6,15 @@ module testbench ();
 
   reg [5:0] opcode;
   reg clk;
+  wire [3:0] state;
 
   initial clk <= 0;
   always #5 clk <= ~clk;
 
   Control uut (
       .opcode(opcode),
-      .clk(clk)
-      // pcWrite,
-      // pcWriteCond,
-      // memGetData,  //(I or D)
-      // memRead,
-      // regWriteDataSelect,  //(memToReg)
-      // irWrite,
-      // regWrite,
-      // aluSrcA,
-      // aluSrcB,
-      // pcSrc
+      .clk(clk),
+      .state(state)
   );
 
   initial begin

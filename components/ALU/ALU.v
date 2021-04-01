@@ -1,3 +1,4 @@
+`include "../../multicycle/opcodes.v"
 module ALU (
     input [WORD_SIZE-1:0] A,
     input [WORD_SIZE-1:0] B,
@@ -8,34 +9,29 @@ module ALU (
 );
   parameter WORD_SIZE = 64;
 
-  parameter ADD = 0;
-  parameter SUB = 1;
-  parameter AND = 2;
-  parameter OR = 3;
-  parameter EQ = 4;
-  parameter XOR = 5;
-  parameter LT = 6;
-  parameter LE = 7;
-  parameter GT = 8;
-  parameter GE = 9;
-  parameter NOT = 10;
 
   always @* begin
     zero <= 0;
 
     case (op)
-      ADD: out <= A + B;
-      SUB: out <= A - B;
+      //aritmetic
+      OP.ALU_ADD: out <= A + B;
+      OP.ALU_SUB: out <= A - B;
+      OP.ALU_MUL: out <= A * B;
+      OP.ALU_SL:  out <= A << B;
+      OP.ALU_DIV: out <= A / B;
+      OP.ALU_MOD: out <= A % B;
       //logical operations 
-      AND: out <= A & B;
-      OR:  out <= A | B;
-      EQ:  out <= A == B;
-      XOR: out <= A ^ B;
-      LT:  out <= A < B;
-      LE:  out <= A <= B;
-      GT:  out <= A > B;
-      GE:  out <= A >= B;
-      NOT: out <= ~A;
+      OP.ALU_NOT: out <= ~A;
+      OP.ALU_OR:  out <= A | B;
+      OP.ALU_AND: out <= A & B;
+      OP.ALU_XOR: out <= A ^ B;
+      OP.ALU_EQ:  out <= A == B;
+      OP.ALU_NEQ: out <= A == B;
+      OP.ALU_LT:  out <= A < B;
+      OP.ALU_LE:  out <= A <= B;
+      OP.ALU_GT:  out <= A > B;
+      OP.ALU_GE:  out <= A >= B;
     endcase
 
     if (out == 0) zero <= 1;
