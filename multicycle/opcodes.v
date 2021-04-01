@@ -1,6 +1,8 @@
+`ifndef OPCODES_V
+`define OPCODES_V 
 module OP ();
   parameter [1:0] ALU_R_HEADER = 2'b00;
-  parameter [1:0] ALU_RI_HEADER = 2'b00;
+  parameter [1:0] ALU_RI_HEADER = 2'b01;
   parameter [2:0] BRANCH_HEADER = 3'b100;
   parameter [2:0] MEMORY_REF_HEADER = 3'b101;
 
@@ -50,3 +52,5 @@ module OP ();
 
 
 endmodule
+
+`endif

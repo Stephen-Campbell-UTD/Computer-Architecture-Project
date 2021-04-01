@@ -11,7 +11,7 @@ module testbench ();
 
   initial begin
     myreg <= 0;
-    #10 myreg <= op.LOAD_IMM;
+    #10 myreg <= OP.LDI;
     #10 $finish;
   end
 
