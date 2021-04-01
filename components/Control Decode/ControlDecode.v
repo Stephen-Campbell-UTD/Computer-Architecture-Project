@@ -1,5 +1,5 @@
 `include "../Control/ControlStates.v"
-`include "../ALU/ALUops.v"
+`include "../../multicycle/opcodes.v"
 module ControlDecode (
     input [3:0] state,
     input [5:0] opcode,
@@ -50,7 +50,7 @@ module ControlDecode (
       regWrite <= 0;
       aluSrcA <= aluSrcA_PC;
       aluSrcB <= aluSrcB_4;
-      aluOP <= ALU_OPS.ADD;
+      aluOP <= OP.ALU_ADD;
       pcSrc <= pcSrc_ALU_DIRECT;
     end
   end
@@ -68,47 +68,79 @@ module ControlDecode (
       regWrite <= 0;
       aluSrcA <= aluSrcA_PC;
       aluSrcB <= aluSrcB_SE_LS_OFFSET;
-      aluOP <= ALU_OPS.ADD;
+      aluOP <= OP.ALU_ADD;
       pcSrc <= pcSrc_D;
     end
   end
   //Immediate Injection 2
-
-  always @* begin
-    if (state == CS.ALU_R3) begin
-      pcWrite <= 0;
-      pcWriteCond <= 0;
-      memGetData <= 0;
-      memRead <= 1;
-      regWriteDataSelect <= regWriteDataSelect_D;
-      irWrite <= 0;
-      regWrite <= 0;
-      aluSrcA <= aluSrcA_BUSA;
-      aluSrcB <= aluSrcB_SE_OFFSET;
-      aluOP <= 0;
-      pcSrc <= pcSrc_D;
-    end
-  end
-  //ALU R Type Step 3 
-
   always @* begin
     if (state == CS.IMMEDIATE_INJECTION2) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
-      memGetData <= 0;
+      memGetData <= 0;  //dont care
       memRead <= 1;
       regWriteDataSelect <= regWriteDataSelect_SE_IMM_BIG;
       irWrite <= 0;
       regWrite <= 1;
       aluSrcA <= aluSrcA_D;
       aluSrcB <= aluSrcB_D;
+      aluOP <= 0;  //dont care
+      pcSrc <= pcSrc_D;
+    end
+  end
+
+  //ALU R Type Step 3 
+
+  always @* begin
+    if (state == CS.ALU_R3) begin
+      pcWrite <= 0;
+      pcWriteCond <= 0;
+      memGetData <= 0;  //dont care
+      memRead <= 1;
+      regWriteDataSelect <= regWriteDataSelect_D;
+      irWrite <= 0;
+      regWrite <= 0;
+      aluSrcA <= aluSrcA_BUSA;
+      aluSrcB <= aluSrcB_BUSB;
       aluOP <= opcode[3:0];
       pcSrc <= pcSrc_D;
     end
   end
   //ALU RI Type Step 3 
+  always @* begin
+    if (state == CS.ALU_RI3) begin
+      pcWrite <= 0;
+      pcWriteCond <= 0;
+      memGetData <= 0;  //dont care
+      memRead <= 1;
+      regWriteDataSelect <= regWriteDataSelect_D;
+      irWrite <= 0;
+      regWrite <= 0;
+      aluSrcA <= aluSrcA_BUSA;
+      aluSrcB <= aluSrcB_SE_OFFSET;
+      aluOP <= opcode[3:0];
+      pcSrc <= pcSrc_D;
+    end
+  end
   //ALU Step 4
+  always @* begin
+    if (state == CS.ALU4) begin
+      pcWrite <= 0;
+      pcWriteCond <= 0;
+      memGetData <= 0;  //dont care
+      memRead <= 1;
+      regWriteDataSelect <= regWriteDataSelect_ALUOUT;
+      irWrite <= 0;
+      regWrite <= 1;
+      aluSrcA <= aluSrcA_D;
+      aluSrcB <= aluSrcB_D;
+      aluOP <= 0;  //dont care
+      pcSrc <= pcSrc_D;
+    end
+  end
   //Branch Step 3
+
+
   //Memory Ref Step 3
   //Load Step 4
   //Store Step 4
