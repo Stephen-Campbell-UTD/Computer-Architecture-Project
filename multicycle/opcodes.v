@@ -55,12 +55,6 @@ module OP ();
   parameter [5:0] SLI = {ALU_RI_HEADER, ALU_SL};
 
   //Branch instructions
-  // parameter [5:0] BEQ = {BRANCH_HEADER, 3'd0};
-  // parameter [5:0] BLEQ = {BRANCH_HEADER, 3'd1};
-  // parameter [5:0] BGEQ = {BRANCH_HEADER, 3'd2};
-  // parameter [5:0] BG = {BRANCH_HEADER, 3'd3};
-  // parameter [5:0] BL = {BRANCH_HEADER, 3'd4};
-  // parameter [5:0] BNEQ = {BRANCH_HEADER, 3'd5};
   parameter [5:0] BEQ = {BRANCH_HEADER, ALU_EQ[2:0]};
   parameter [5:0] BNEQ = {BRANCH_HEADER, ALU_NEQ[2:0]};
   parameter [5:0] BLT = {BRANCH_HEADER, ALU_LT[2:0]};

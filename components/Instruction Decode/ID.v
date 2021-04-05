@@ -8,6 +8,7 @@ module InstructionDecode (
     output [BIG_IMMEDIATE_SIZE-1:0] bgImm,
     output [JUMP_ADDRESS_SIZE-1:0] jumpAddress
 );
+  //must keep consistent with the multicycle
   parameter INSTRUCTION_SIZE = 20;
   parameter OP_SIZE = 6;
   parameter REG_ADDRESS_SIZE = 2;
