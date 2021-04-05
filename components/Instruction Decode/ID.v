@@ -30,7 +30,7 @@ module InstructionDecode (
   //immediate decode
   assign smImm = instruction[SMALL_IMMEDIATE_SIZE-1:0];
   assign bgImm = instruction[BIG_IMMEDIATE_SIZE-1:0];
-  assign jumpAddress = instruction[OP_LSB-1:OP_LSB-1-JUMP_ADDRESS_SIZE];
+  assign jumpAddress = instruction[OP_LSB-1:OP_LSB-JUMP_ADDRESS_SIZE];
 
 
   // Instruction format 1: 3 Registers Selections -> Data computation 
