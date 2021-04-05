@@ -7,7 +7,7 @@ module testbench ();
 
   InstructionDecode uut (.instruction(in));
 
-
+  //specific to open source tools that I am using
   initial begin
     $dumpfile("./build/main.vcd");
     $dumpvars(0, testbench);
