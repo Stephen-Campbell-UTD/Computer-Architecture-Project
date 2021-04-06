@@ -10,4 +10,8 @@ module GenReg #(
     dataOut <= dataIn;
   end
 
+  initial begin
+   dataOut <= 0;
+  end
+
 endmodule

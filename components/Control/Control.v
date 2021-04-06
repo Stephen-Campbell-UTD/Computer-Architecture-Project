@@ -1,5 +1,8 @@
+`ifndef MULTICYCLE
 `include "./ControlStates.v"
 `include "../../multicycle/opcodes.v"
+`endif
+
 module Control (
     input [5:0] opcode,
     input clk,

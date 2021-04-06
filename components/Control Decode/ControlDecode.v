@@ -1,5 +1,7 @@
+`ifndef MULTICYCLE
 `include "../Control/ControlStates.v"
 `include "../../multicycle/opcodes.v"
+`endif
 module ControlDecode (
     input [3:0] state,
     input [5:0] opcode,

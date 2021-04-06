@@ -1,4 +1,6 @@
+`ifndef MULTICYCLE
 `include "../../multicycle/opcodes.v"
+`endif
 module ALU (
     input [WORD_SIZE-1:0] A,
     input [WORD_SIZE-1:0] B,

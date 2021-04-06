@@ -1,4 +1,4 @@
-SOURCES = $(wildcard *tb.v)
+SOURCES = multicycle.v
 SIMFILE = main.vcd
 
 
