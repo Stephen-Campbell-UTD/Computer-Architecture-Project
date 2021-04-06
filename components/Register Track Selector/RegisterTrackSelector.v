@@ -1,22 +1,22 @@
 module regTS (
     input trackSelect,
-    input rAlpha,
-    input rBeta,
-    input rGamma,
-    output reg R1,
-    output reg R2,
-    output reg RW
+    input [1:0] rAlpha,
+    input [1:0] rBeta,
+    input [1:0] rGamma,
+    output reg [1:0] R1,
+    output reg [1:0] R2,
+    output reg [1:0] RW
 );
 
   always @* begin
-    if(trackSelect) begin
+    if (trackSelect) begin
       R1 <= rBeta;
       R2 <= rGamma;
       RW <= rAlpha;
     end else begin
       R1 <= rAlpha;
       R2 <= rBeta;
-      RW <= 0;// dont care
+      RW <= 0;  // dont care
     end
   end
 

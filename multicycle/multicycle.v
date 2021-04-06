@@ -35,14 +35,14 @@ module Multicycle (
   wire [WORD_SIZE-1:0] mem_mdr;
 
   wire [OP_SIZE-1:0] ir_control;  //for opcode
-  wire [JUMP_ADDRESS_SIZE-1:0] ir_leftShiftAddress;
+  wire [JUMP_ADDRESS_SIZE:0] ir_leftShiftAddress;
   wire [REG_ADDRESS_SIZE-1:0] ir_regTSAlpha;
   wire [REG_ADDRESS_SIZE-1:0] ir_regTSBeta;
   wire [REG_ADDRESS_SIZE-1:0] ir_regTSGamma; 
   wire [BIG_IMMEDIATE_SIZE-1:0] ir_signExtendBig;
   wire [SMALL_IMMEDIATE_SIZE-1:0] ir_signExtendOffset;
 
-  wire [WORD_SIZE-1:0] mdr_regWriteDestMux;
+  wire [WORD_SIZE-1:0] mdr_regWriteDataMux;
 
   wire [WORD_SIZE-1:0] signExtendOffset_aluSrcBMux;
   wire [WORD_SIZE-1:0] signExtendOffset_leftShiftOffset;
@@ -64,9 +64,9 @@ module Multicycle (
 
   wire [ADDRESS_SIZE-1:0] aluOut_pcSrcMux;
   wire [ADDRESS_SIZE-1:0] aluOut_memGetDataMux;
-  wire [WORD_SIZE-1:0] aluOut_regWriteDestMux;
+  wire [WORD_SIZE-1:0] aluOut_regWriteDataMux;
 
-  wire [WORD_SIZE-1:0] signExtendBig_regWriteDestMux;
+  wire [WORD_SIZE-1:0] signExtendBig_regWriteDataMux;
 
   wire [ADDRESS_SIZE-1:0] pcSrcMux_pc;
   wire [ADDRESS_SIZE-1:0] memGetDatMux_memAddress;
@@ -100,7 +100,9 @@ module Multicycle (
   Control control(
     .opcode(ir_control),
     .clk(clk), 
-    .state(controlFSM_controlDecode) );
+    .state(controlFSM_controlDecode) 
+    );
+
   ControlDecode control(
     .state(controlFSM_controlDecode),
     .opcode(ir_control),
@@ -156,10 +158,11 @@ module Multicycle (
   GenReg #(.WIDTH(64)) memoryDestinationRegister (
     .clk(clk),
     .dataIn(mem_mdr),
-    .dataOut(mdr_regWriteDestMux)
+    .dataOut(mdr_regWriteDataMux)
     );
 
   //Register Track Selector
+
   regTS registerTrackSelector(
     .trackSelect(regTrackSelect),
     .rAlpha(ir_regTSAlpha),
@@ -173,9 +176,9 @@ module Multicycle (
   //Register Write Data Mux
 
   Mux4 #(.BUS_BITS(64)) regWriteDataMux(
-    .in1(mdr_regWriteDestMux),
-    .in2(aluOut_regWriteDestMux),
-    .in3(signExtendBig_regWriteDestMux),
+    .in1(mdr_regWriteDataMux),
+    .in2(aluOut_regWriteDataMux),
+    .in3(signExtendBig_regWriteDataMux),
     .in4(0),// not used
     .sel(regWriteDataSelect)
     .out(regWriteDataMux_regBusWriteData)
@@ -185,12 +188,13 @@ module Multicycle (
 
   wire regBusAOut;
 
+
   RegisterFile registerFile(
     .selA(regTS_regSelA),
     .selB(regTS_regSelB),
     .selWrite(regTS_regSelWrite),
     .writeIn(regWriteDataMux_regBusWriteData),
-    .isReading(regWrite),
+    .isReading(~regWrite),//note the bitwise negation 
     .clk(clk),
     .outA(regBusAOut),
     .outB(regBusB_aluSrcBMux)
@@ -215,7 +219,7 @@ module Multicycle (
     .NUM_IN_BITS(BIG_IMMEDIATE_SIZE),
     .NUM_OUT_BITS(WORD_SIZE)) signExtendOffset(
       .in(ir_signExtendBig)
-      .out(signExtendBig_regWriteDestMux)
+      .out(signExtendBig_regWriteDataMux)
     );
 
  // leftShiftOffset 
@@ -230,7 +234,7 @@ module Multicycle (
  Mux2 #(
    .BUS_BITS(64)
  ) aluSrcAMux(
-   .in1(pc_aluSRCA),
+   .in1(pc_aluSrcA),
    .in2(regBusA_aluSrcAMux),
    .sel(aluSrcA),
    .out(aluSrcAMux_AluA),
@@ -273,7 +277,7 @@ module Multicycle (
   );
   assign aluOut_memGetDataMux = aluOut_dataOut[ADDRESS_SIZE-1:0];
   assign aluOut_pcSrcMux = aluOut_dataOut[ADDRESS_SIZE-1:0];
-  assign aluOut_regWriteDestMux = aluOut_dataOut
+  assign aluOut_regWriteDataMux = aluOut_dataOut
 
  // leftShiftAddress 
 
@@ -306,13 +310,13 @@ module Multicycle (
    .dataOut(pc_out),
  );
 
- assign pc_aluSRCA = {44'b0,pc_out};
+ assign pc_aluSrcA = {44'b0,pc_out};
  assign pc_memGetDataMux = pc_out;
 
  // memGetDataMux
 
  Mux2 #(
-   .BUS_BITS(64)) memGetDataMux(
+   .BUS_BITS(ADDRESS_SIZE)) memGetDataMux(
      .in1(pc_memGetDataMux),
      .in2(aluOut_memGetDataMux),
      .sel(memGetData),
