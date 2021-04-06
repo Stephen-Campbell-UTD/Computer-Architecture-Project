@@ -1,0 +1,13 @@
+//32 bit aligned left 0 padded instructions
+
+// program A + B -> C
+
+//load A R1
+// 1010 00 | 00 | 01 | 00 0100 0000 -> 0x040  ('d64)
+// opcode  | RD | R1 | offset (10 bits)
+// A0440
+00 0A 04 40
+//load B R2
+//load destination_address R3
+//add R1 R2 ->R3
+//store RC R3(0)

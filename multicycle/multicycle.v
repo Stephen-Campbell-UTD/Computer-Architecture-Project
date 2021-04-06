@@ -1,4 +1,4 @@
-
+`timescale 1ns / 1ps
 `define MULTICYCLE 
 
 `include "./opcodes.v"
@@ -37,7 +37,7 @@ module Multicycle ();
   wire [WORD_SIZE-1:0] pc_aluSrcA;
   wire [ADDRESS_SIZE-1:0] pc_memGetDataMux;
 
-  wire [WORD_SIZE-1:0] mem_ir;
+  wire [INSTRUCTION_SIZE-1:0] mem_ir;
   wire [WORD_SIZE-1:0] mem_mdr;
 
   wire [OP_SIZE-1:0] ir_control;  //for opcode
@@ -54,8 +54,9 @@ module Multicycle ();
   wire [WORD_SIZE-1:0] signExtendOffset_leftShiftOffset;
 
   wire [WORD_SIZE-1:0] regBusA_aluSrcAMux;
-  wire [WORD_SIZE-1:0] regBusA_memData;
+
   wire [WORD_SIZE-1:0] regBusB_aluSrcBMux;
+  wire [WORD_SIZE-1:0] regBusB_memData;
 
   wire [WORD_SIZE-1:0] leftShiftOffset_aluSrcBMux;
 
@@ -133,18 +134,18 @@ module Multicycle ();
   RAM ram (
       .address(memGetDatMux_memAddress),
       .isReading(memRead),
-      .clk(clk),
-      .dataIn(regBusA_memData),
+      .dataIn(regBusB_memData),
       .dataOut(memDataOut)
   );
-  assign mem_ir  = memDataOut;
+  // 32 bit aligned 0 padded to the left 20 bit big endian instructions
+  assign mem_ir  = memDataOut[WORD_SIZE-1-12:WORD_SIZE-WORD_SIZE/2];
   assign mem_mdr = memDataOut;
 
   // Instruction Register 
 
-  wire [WORD_SIZE-1:0] ir_out;
+  wire [INSTRUCTION_SIZE-1:0] ir_out;
   GenReg #(
-      .WIDTH(64)
+      .WIDTH(INSTRUCTION_SIZE)
   ) instructionRegister (
       .clk(clk),
       .dataIn(mem_ir),
@@ -198,7 +199,7 @@ module Multicycle ();
 
   //Register File
 
-  wire [WORD_SIZE-1:0] regBusAOut;
+  wire [WORD_SIZE-1:0] regBusBOut;
 
   RegisterFile registerFile (
       .selA(regTS_regSelA),
@@ -207,12 +208,12 @@ module Multicycle ();
       .writeIn(regWriteDataMux_regBusWriteData),
       .isReading(~regWrite),  //note the bitwise negation 
       .clk(clk),
-      .outA(regBusAOut),
-      .outB(regBusB_aluSrcBMux)
+      .outA(regBusA_aluSrcAMux),
+      .outB(regBusBOut)
   );
 
-  assign regBusA_aluSrcAMux = regBusAOut;
-  assign regBusA_memData = regBusAOut;
+  assign regBusB_aluSrcBMux = regBusBOut;
+  assign regBusB_memData = regBusBOut;
 
   // signExtendOffset 
   wire [WORD_SIZE-1:0] signExtendOffsetOut;
@@ -338,16 +339,38 @@ module Multicycle ();
       .sel(memGetData),
       .out(memGetDatMux_memAddress)
   );
-  initial begin
+  initial begin : simSetup
+    integer c;
+
     $dumpfile("./build/main.vcd");
     $dumpvars(0, Multicycle);
+    for (c = 0; c < 24; c = c + 1) begin
+      $dumpvars(0, ram.ram_memory[c]);
+    end
   end
 
-
-  initial begin
+  //   parameter BYTE = 8;
+  initial begin : sim
+    integer i;
+    #5;
     clk <= 0;
-    pc.dataOut <= 11'h400;
-    #10;
+    pc.dataOut <= 11'h0;
+    control.state <= CS.INSTRUCTION_FETCH;
+    $readmemh("./program.mem", ram.ram_memory, 0, 3);
+    #5;
+    clk <= 1;
+    //NOW in INSTRUCTION FETCH
+    #5;
+    clk <= 0;
+    #5;
+
+    // for (i = 0; i < 5; i = i + 1) begin
+    //   clk <= 1;
+    //   #5;
+    //   clk <= 0;
+    //   #5;
+    // end
+
     $finish;
   end
 

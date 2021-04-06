@@ -1,7 +1,6 @@
 module RAM (
     input [ADDRESS_SIZE-1:0] address,
     input isReading,
-    input clk,
     input [MEM_WORD_SIZE-1:0] dataIn,
     output reg [MEM_WORD_SIZE-1:0] dataOut
 );
@@ -11,10 +10,10 @@ module RAM (
   parameter BYTE = 8;
 
   //memory is byte addressed and comes out big endian
-  reg [BYTE-1:0] ram_memory[MEM_DEPTH-1:0];
+  reg [BYTE-1:0] ram_memory[0:MEM_DEPTH-1];
 
   // assign data = (isReading ? data_private : {MEM_WORD_SIZE{1'bZ}});
-  always @(posedge clk) begin
+  always @* begin
     if (isReading) begin
       dataOut <= {
         ram_memory[address],
@@ -38,12 +37,5 @@ module RAM (
     end
   end
 
-  initial begin : mem_initialization
-    integer i;
-    for (i = 0; i < MEM_DEPTH; i = i + 1) begin
-      ram_memory[i] <= 0;
-    end
-    dataOut <= 0;
-  end
 
 endmodule

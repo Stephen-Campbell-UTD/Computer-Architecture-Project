@@ -45,7 +45,7 @@ module Control (
           OP.LD[2]:  state <= CS.LOAD4;
           OP.STR[2]: state <= CS.STORE4;
           default: begin
-            $display("Somehow ended up at Register Fetch with bad opcode header");
+            $display("Somehow ended up at Memory Ref with bad opcode header");
           end
         endcase
       end
