@@ -15,7 +15,7 @@ module testbench ();
   initial begin
     $dumpfile("./build/main.vcd");
     $dumpvars(0, testbench);
-    for (c = 0; c < 2047; c = c + 1) begin
+    for (c = 1020; c < 1040; c = c + 1) begin
       $dumpvars(0, mem.ram_memory[c]);
     end
   end
