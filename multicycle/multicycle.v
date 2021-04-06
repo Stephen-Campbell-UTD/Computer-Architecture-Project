@@ -338,10 +338,15 @@ module Multicycle ();
       .sel(memGetData),
       .out(memGetDatMux_memAddress)
   );
+  initial begin
+    $dumpfile("./build/main.vcd");
+    $dumpvars(0, Multicycle);
+  end
+
 
   initial begin
     clk <= 0;
-    pc.dataOut <= 20'hABCDE;
+    pc.dataOut <= 11'h400;
     #10;
     $finish;
   end
