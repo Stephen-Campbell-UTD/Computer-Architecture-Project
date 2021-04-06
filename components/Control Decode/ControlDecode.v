@@ -13,7 +13,8 @@ module ControlDecode (
     output reg aluSrcA,
     output reg [1:0] aluSrcB,
     output reg [3:0] aluOP,
-    output reg [1:0] pcSrc
+    output reg [1:0] pcSrc,
+    output reg regTrackSelect
 );
 
   //mux selection parameters
@@ -235,5 +236,19 @@ module ControlDecode (
       pcSrc <= pcSrc_JUMP_ADDRESS;
     end
   end
+
+
+  always @* begin
+    if ((opcode[5:3] == OP.BRANCH_HEADER) || (opcode[5:2] == {
+          OP.MEMORY_REF_HEADER, 1'b1
+        })) begin  //branch or store
+      regTrackSelect = 1'b1;
+    end else begin
+      regTrackSelect = 1'b0;
+    end
+  end
+
+
+
 
 endmodule
