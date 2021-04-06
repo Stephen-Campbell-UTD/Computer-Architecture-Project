@@ -3,16 +3,12 @@ module ALU (
     input [WORD_SIZE-1:0] A,
     input [WORD_SIZE-1:0] B,
     input [3:0] op,
-    output reg [WORD_SIZE-1:0] out,
-    // output reg carry,
-    output reg zero
+    output reg [WORD_SIZE-1:0] out
 );
   parameter WORD_SIZE = 64;
 
 
   always @* begin
-    zero <= 0;
-
     case (op)
       //aritmetic
       OP.ALU_ADD: out <= A + B;
@@ -33,8 +29,6 @@ module ALU (
       OP.ALU_GT:  out <= A > B;
       OP.ALU_GE:  out <= A >= B;
     endcase
-
-    if (out == 0) zero <= 1;
 
   end
 endmodule

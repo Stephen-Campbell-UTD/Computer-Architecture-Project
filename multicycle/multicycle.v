@@ -5,6 +5,11 @@
 `include "../components/Control Decode/ControlDecode.v"
 `include "../components/Control Decode/ControlDecode.v"
 `include "../components/Muxes/Mux4.v"
+`include "../components/Muxes/Mux2.v"
+`include "../components/Register File/RegisterFile.v"
+`include "../components/Sign Extender/SignExtender.v"
+`include "../components/Left Shift/LeftShift.v"
+`include "../components/ALU/ALU.v"
 
 module Multicycle (
     input clk
@@ -23,8 +28,8 @@ module Multicycle (
   parameter ADDRESS_SIZE = 20;
   parameter WORD_SIZE = 64;
 
-  wire [ADDRESS_SIZE-1:0] pc_pcWriteMux;
-  wire [WORD_SIZE-1:0] pc_aluSRCA;
+  wire [WORD_SIZE-1:0] pc_aluSrcA;
+  wire [ADDRESS_SIZE-1:0] pc_memGetDataMux;
 
   wire [WORD_SIZE-1:0] mem_ir;
   wire [WORD_SIZE-1:0] mem_mdr;
@@ -65,7 +70,6 @@ module Multicycle (
 
   wire [ADDRESS_SIZE-1:0] pcSrcMux_pc;
   wire [ADDRESS_SIZE-1:0] memGetDatMux_memAddress;
-  wire [ADDRESS_SIZE-1:0] pc_memGetDataMux;
 
   wire pcWrite;
   wire pcWriteCond;
@@ -82,9 +86,9 @@ module Multicycle (
 
   wire [1:0] pcWriteCombo;
 
-  wire [REG_ADDRESS_SIZE-1:0] regTS_regBusA; 
-  wire [REG_ADDRESS_SIZE-1:0] regTS_regBusB; 
-  wire [REG_ADDRESS_SIZE-1:0] regTS_regBusWriteSelect; 
+  wire [REG_ADDRESS_SIZE-1:0] regTS_regSelA; 
+  wire [REG_ADDRESS_SIZE-1:0] regTS_regSelB; 
+  wire [REG_ADDRESS_SIZE-1:0] regTS_regSelWrite; 
   
   wire [WORD_SIZE-1:0] regWriteDataMux_regBusWriteData; 
 
@@ -161,9 +165,9 @@ module Multicycle (
     .rAlpha(ir_regTSAlpha),
     .rBeta(ir_regTSBeta),
     .rGamma(ir_regTSGamma),
-    .R1(regTS_regBusA),
-    .R2(regTS_regBusB),
-    .RW(regTS_regBusWriteSelect)
+    .R1(regTS_regSelA),
+    .R2(regTS_regSelB),
+    .RW(regTS_regSelWrite)
   ); 
 
   //Register Write Data Mux
@@ -179,6 +183,140 @@ module Multicycle (
 
   //Register File
 
+  wire regBusAOut;
 
+  RegisterFile registerFile(
+    .selA(regTS_regSelA),
+    .selB(regTS_regSelB),
+    .selWrite(regTS_regSelWrite),
+    .writeIn(regWriteDataMux_regBusWriteData),
+    .isReading(regWrite),
+    .clk(clk),
+    .outA(regBusAOut),
+    .outB(regBusB_aluSrcBMux)
+  );
+
+  assign regBusA_aluSrcAMux = regBusAOut;  
+  assign regBusA_memData = regBusAOut;
+
+ // signExtendOffset 
+ wire signExtendOffsetOut;
+  SignExtender #(
+    .NUM_IN_BITS(SMALL_IMMEDIATE_SIZE),
+    .NUM_OUT_BITS(WORD_SIZE)) signExtendOffset(
+      .in(ir_signExtendOffset)
+      .out(signExtendOffsetOut)
+    );
+  assign signExtendOffset_aluSrcBMux = signExtendOffsetOut; 
+  assign signExtendOffset_leftShiftOffset = signExtendOffsetOut;
+
+ // signExtendBig 
+  SignExtender #(
+    .NUM_IN_BITS(BIG_IMMEDIATE_SIZE),
+    .NUM_OUT_BITS(WORD_SIZE)) signExtendOffset(
+      .in(ir_signExtendBig)
+      .out(signExtendBig_regWriteDestMux)
+    );
+
+ // leftShiftOffset 
+  LeftShift #(
+    .NUM_BITS(WORD_SIZE)) leftShiftOffset(
+      .in(signExtendOffset_leftShiftOffset)
+      .out(leftShiftOffset_aluSrcBMux)
+    );
+
+ // aluSrcAMux 
+
+ Mux2 #(
+   .BUS_BITS(64)
+ ) aluSrcAMux(
+   .in1(pc_aluSRCA),
+   .in2(regBusA_aluSrcAMux),
+   .sel(aluSrcA),
+   .out(aluSrcAMux_AluA),
+ );
+ 
+ // aluSrcBMux 
+
+ Mux4 #(
+   .BUS_BITS(64)
+ ) aluSrcBMux(
+   .in1(64'd4), // for PC+4
+   .in2(regBusB_aluSrcBMux),
+   .in3(leftShiftOffset_aluSrcBMux),
+   .in4(signExtendOffset_aluSrcBMux),
+   .sel(aluSrcB),
+   .out(aluSrcBMux_AluB)
+ );
+ // alu 
+  wire aluOutWire;
+  ALU alu (
+    .A(aluSrcAMux_AluA),
+    .B(aluSrcBMux_AluB),
+    .op(aluOP),
+    .out(aluOutWire)
+  );
+
+  assign alu_aluOut = aluOutWire;
+  assign alu_pcWriteCombo = aluOutWire[0]; //take LSB of ALU as comparison result
+  assign alu_pcSrcMux = aluOutWire[ADDRESS_SIZE-1:0];
+
+ // aluOut 
+ wire aluOut_dataOut;
+
+  GenReg #(
+    .WIDTH(64)
+  ) aluOut (
+    .clk(clk)
+    .dataIn(alu_aluOut),
+    .dataOut(aluOut_dataOut),
+  );
+  assign aluOut_memGetDataMux = aluOut_dataOut[ADDRESS_SIZE-1:0];
+  assign aluOut_pcSrcMux = aluOut_dataOut[ADDRESS_SIZE-1:0];
+  assign aluOut_regWriteDestMux = aluOut_dataOut
+
+ // leftShiftAddress 
+
+  LeftShift #(.NUM_BITS(ADDRESS_SIZE))
+   leftShiftAddress(
+     .in(ir_leftShiftAddress),
+     .out(leftShiftAddress_pcSrcMux)
+   );
+
+ // pcSrcMux
+ Mux4#(
+   .BUS_BITS(ADDRESS_SIZE)
+   ) pcSrc(
+     .in1(aluOut_pcSrcMux),
+     .in2(leftShiftAddress_pcSrcMux),
+     .in3(alu_pcSrcMux),
+     .in4(0),//not used
+     .sel(pcSrc),
+     .out(pcSrcMux_pc),
+   );
+ // pc
+
+  wire pc_out;
+
+ GenReg #(
+   .WIDTH(ADDRESS_SIZE)
+ ) pc (
+   .clk(clk),
+   .dataIn(pcSrcMux_pc),
+   .dataOut(pc_out),
+ );
+
+ assign pc_aluSRCA = {44'b0,pc_out};
+ assign pc_memGetDataMux = pc_out;
+
+ // memGetDataMux
+
+ Mux2 #(
+   .BUS_BITS(64)) memGetDataMux(
+     .in1(pc_memGetDataMux),
+     .in2(aluOut_memGetDataMux),
+     .sel(memGetData),
+     .out(memGetDatMux_memAddress),
+   )
 
 endmodule

@@ -9,15 +9,13 @@ module testbench ();
   reg [63:0] B;
   reg [3:0] op;
   wire [63:0] out;
-  wire zer0;
 
 
   ALU uut (
       .A(A),
       .B(B),
       .op(op),
-      .out(out),
-      .zero(zero)
+      .out(out)
   );
 
   initial begin
