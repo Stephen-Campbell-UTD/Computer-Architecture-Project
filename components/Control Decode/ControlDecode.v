@@ -46,7 +46,7 @@ module ControlDecode (
     if (state == CS.INSTRUCTION_FETCH) begin
       pcWrite <= 1;
       pcWriteCond <= 0;
-      memGetData <= 1;
+      memGetData <= 0;
       memRead <= 1;
       regWriteDataSelect <= regWriteDataSelect_D;
       irWrite <= 1;
@@ -179,7 +179,7 @@ module ControlDecode (
     if (state == CS.LOAD4) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
-      memGetData <= 0;  //get the data!
+      memGetData <= 1;  //get the data!
       memRead <= 1;
       regWriteDataSelect <= regWriteDataSelect_D;
       irWrite <= 0;  //dont care
@@ -195,7 +195,7 @@ module ControlDecode (
     if (state == CS.STORE4) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
-      memGetData <= 0;  //dont care
+      memGetData <= 1;  //dont care
       memRead <= 0;  //writing!
       regWriteDataSelect <= regWriteDataSelect_D;
       irWrite <= 0;  //dont care

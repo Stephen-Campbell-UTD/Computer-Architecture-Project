@@ -123,6 +123,7 @@ module Multicycle ();
       .aluSrcB(aluSrcB),
       .aluOP(aluOP),
       .pcSrc(pcSrc),
+      .regWrite(regWrite),
       .regTrackSelect(regTrackSelect)
   );
 
@@ -148,6 +149,7 @@ module Multicycle ();
       .WIDTH(INSTRUCTION_SIZE)
   ) instructionRegister (
       .clk(clk),
+      .isWriting(irWrite),
       .dataIn(mem_ir),
       .dataOut(ir_out)
   );
@@ -168,6 +170,7 @@ module Multicycle ();
       .WIDTH(64)
   ) memoryDestinationRegister (
       .clk(clk),
+      .isWriting(1'b1),
       .dataIn(mem_mdr),
       .dataOut(mdr_regWriteDataMux)
   );
@@ -287,6 +290,7 @@ module Multicycle ();
       .WIDTH(64)
   ) aluOut (
       .clk(clk),
+      .isWriting(1'b1),
       .dataIn(alu_aluOut),
       .dataOut(aluOut_dataOut)
   );
@@ -322,6 +326,7 @@ module Multicycle ();
       .WIDTH(ADDRESS_SIZE)
   ) pc (
       .clk(clk),
+      .isWriting(pcWrite),
       .dataIn(pcSrcMux_pc),
       .dataOut(pc_out)
   );
@@ -339,37 +344,49 @@ module Multicycle ();
       .sel(memGetData),
       .out(memGetDatMux_memAddress)
   );
+
+  parameter programMemStart = 'h400;  //1024;
+  parameter dataMemStart = 'h000;  //1024;
+
+
   initial begin : simSetup
     integer c;
 
     $dumpfile("./build/main.vcd");
     $dumpvars(0, Multicycle);
-    for (c = 0; c < 24; c = c + 1) begin
+    //dump data memory
+    for (c = dataMemStart; c < dataMemStart + 24; c = c + 1) begin
       $dumpvars(0, ram.ram_memory[c]);
+    end
+    //dump program memory
+    for (c = programMemStart; c < programMemStart + 24; c = c + 1) begin
+      $dumpvars(0, ram.ram_memory[c]);
+    end
+    //dump register
+    for (c = 0; c < 4; c = c + 1) begin
+      $dumpvars(0, registerFile.registers[c]);
     end
   end
 
   //   parameter BYTE = 8;
   initial begin : sim
     integer i;
-    #5;
     clk <= 0;
-    pc.dataOut <= 11'h0;
+    pc.dataOut <= programMemStart;
     control.state <= CS.INSTRUCTION_FETCH;
-    $readmemh("./program.mem", ram.ram_memory, 0, 3);
-    #5;
-    clk <= 1;
-    //NOW in INSTRUCTION FETCH
-    #5;
-    clk <= 0;
+
+    $readmemh("./memory/program.mem", ram.ram_memory, programMemStart, programMemStart + 5 * 4 - 1);
+    $readmemh("./memory/data.mem", ram.ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
     #5;
 
-    // for (i = 0; i < 5; i = i + 1) begin
-    //   clk <= 1;
-    //   #5;
-    //   clk <= 0;
-    //   #5;
-    // end
+    // load + load + add + store + 1
+    // 5 + 5 + 3 + 4 + 1
+    for (i = 0; i < 18; i = i + 1) begin
+      clk <= 1;
+      #5;
+      clk <= 0;
+      #5;
+    end
 
     $finish;
   end
