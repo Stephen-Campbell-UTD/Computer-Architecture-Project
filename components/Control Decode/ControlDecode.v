@@ -75,9 +75,9 @@ module ControlDecode (
       pcSrc <= pcSrc_D;
     end
   end
-  //Immediate Injection 2
+  //Immediate Injection 3
   always @* begin
-    if (state == CS.IMMEDIATE_INJECTION2) begin
+    if (state == CS.IMMEDIATE_INJECTION3) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 0;  //dont care

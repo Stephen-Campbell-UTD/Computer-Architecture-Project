@@ -1,10 +1,10 @@
 `ifndef CONTROL_STATES_V
-`define CONTROL_STATES_V
-module CS();
+`define CONTROL_STATES_V 
+module CS ();
   //12 states -> 4 bits
   parameter INSTRUCTION_FETCH = 4'd0;
   parameter REGISTER_FETCH = 4'd1;
-  parameter IMMEDIATE_INJECTION2 = 4'd2;
+  parameter IMMEDIATE_INJECTION3 = 4'd2;
   parameter ALU_R3 = 4'd3;
   parameter ALU_RI3 = 4'd4;
   parameter ALU4 = 4'd5;

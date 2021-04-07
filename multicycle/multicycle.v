@@ -91,7 +91,7 @@ module Multicycle ();
   wire [1:0] pcSrc;
   wire regTrackSelect;
 
-  wire [1:0] pcWriteCombo;
+  wire pcWriteCombo;
 
   wire [REG_ADDRESS_SIZE-1:0] regTS_regSelA;
   wire [REG_ADDRESS_SIZE-1:0] regTS_regSelB;
@@ -326,7 +326,7 @@ module Multicycle ();
       .WIDTH(ADDRESS_SIZE)
   ) pc (
       .clk(clk),
-      .isWriting(pcWrite),
+      .isWriting(pcWriteCombo),
       .dataIn(pcSrcMux_pc),
       .dataOut(pc_out)
   );
@@ -368,19 +368,21 @@ module Multicycle ();
     end
   end
 
-  initial begin : add_sim
+
+  initial begin : loop_sum_sim
     integer i;
     clk <= 0;
     pc.dataOut <= programMemStart;
     control.state <= CS.INSTRUCTION_FETCH;
 
-    $readmemh("./memory/add_program.mem", ram.ram_memory, programMemStart, programMemStart + 5 * 4 - 1);
-    $readmemh("./memory/add_data.mem", ram.ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
+    $readmemh("./memory/loop_sum_program.mem", ram.ram_memory, programMemStart,
+              programMemStart + 8 * 4 - 1);
+    // $readmemh("./memory/loop_sum_data.mem", ram.ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
     #5;
 
-    // load + load + add + store + 1
-    // 5 + 5 + 3 + 4 + 1
-    for (i = 0; i < 18; i = i + 1) begin
+    // (starts at IF ) 3*loadi + branch + add + addi + jump
+    // 3*3  + 3 + 4 + 4 + 3 -> 23
+    for (i = 0; i < 170; i = i + 1) begin
       clk <= 1;
       #5;
       clk <= 0;
@@ -389,5 +391,31 @@ module Multicycle ();
 
     $finish;
   end
+
+
+
+
+
+  //   initial begin : add_sim
+  //     integer i;
+  //     clk <= 0;
+  //     pc.dataOut <= programMemStart;
+  //     control.state <= CS.INSTRUCTION_FETCH;
+
+  //     $readmemh("./memory/add_program.mem", ram.ram_memory, programMemStart, programMemStart + 5 * 4 - 1);
+  //     $readmemh("./memory/add_data.mem", ram.ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
+  //     #5;
+
+  //     // load + load + add + store + 1
+  //     // 5 + 5 + 3 + 4 + 1
+  //     for (i = 0; i < 18; i = i + 1) begin
+  //       clk <= 1;
+  //       #5;
+  //       clk <= 0;
+  //       #5;
+  //     end
+
+  //     $finish;
+  //   end
 
 endmodule

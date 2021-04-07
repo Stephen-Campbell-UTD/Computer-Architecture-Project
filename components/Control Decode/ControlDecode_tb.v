@@ -28,8 +28,8 @@ module testbench ();
     state <= CS.REGISTER_FETCH;
     opcode <= OP.ADD;
     #10
-    //Immediate Injection 2
-    state <= CS.IMMEDIATE_INJECTION2;
+    //Immediate Injection 3
+    state <= CS.IMMEDIATE_INJECTION3;
     opcode <= OP.LDI;
     #10
     //ALU R 3

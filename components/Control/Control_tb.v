@@ -82,7 +82,7 @@ module testbench ();
     // fist clock ticks at 205ns
     // Jump takes 3 clocks = 10ns * 3 = 30ns
     // control will be in IF between the beginning of 
-    // the 3th clock and end of next clock (225ns to 235ns)
+    // the 3rd clock and end of next clock (225ns to 235ns)
     // IF (0)-> RF (1)-> JUMP3 (11)
     opcode <= OP.JUMP;
     #30;  //230ns
@@ -90,12 +90,12 @@ module testbench ();
     //Immediate Injection route
 
     // fist clock ticks at 235ns
-    // Imm Injection takes 2 clocks = 10ns * 2 = 20ns
+    // Imm Injection takes 3 clocks = 10ns * 3 = 30ns
     // control will be in IF between the beginning of 
-    // the 2nd clock and end of next clock (255ns to 265ns)
-    // IF (0)->  IMMEDIATE_INJECTION2 (2)
+    // the 3rd clock and end of next clock (265ns to 275ns)
+    // IF (0)->  IMMEDIATE_INJECTION3(2)
     opcode <= OP.LDI;
-    #20;  //250ns
+    #30;  //260ns
     $finish;
   end
 

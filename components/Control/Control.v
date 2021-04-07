@@ -17,12 +17,7 @@ module Control (
 
   always @(posedge clk) begin
     case (state)
-      CS.INSTRUCTION_FETCH: begin
-        case (opcode)
-          OP.LDI:  state <= CS.IMMEDIATE_INJECTION2;
-          default: state <= CS.REGISTER_FETCH;
-        endcase
-      end
+      CS.INSTRUCTION_FETCH: state <= CS.REGISTER_FETCH;
       CS.REGISTER_FETCH: begin
         casez (opcode[5:3])
           {OP.ALU_R_HEADER, 1'b?} : state <= CS.ALU_R3;
@@ -30,12 +25,13 @@ module Control (
           OP.BRANCH_HEADER: state <= CS.BRANCH3;
           OP.MEMORY_REF_HEADER: state <= CS.MEMORY_REF3;
           OP.JUMP[5:3]: state <= CS.JUMP3;
+          OP.LDI[5:3]: state <= CS.IMMEDIATE_INJECTION3;
           default: begin
             $display("Somehow ended up at Register Fetch with bad opcode header");
           end
         endcase
       end
-      CS.IMMEDIATE_INJECTION2: state <= CS.INSTRUCTION_FETCH;
+      CS.IMMEDIATE_INJECTION3: state <= CS.INSTRUCTION_FETCH;
       CS.ALU_R3: state <= CS.ALU4;
       CS.ALU_RI3: state <= CS.ALU4;
       CS.ALU4: state <= CS.INSTRUCTION_FETCH;
