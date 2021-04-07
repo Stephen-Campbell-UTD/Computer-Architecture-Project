@@ -368,15 +368,14 @@ module Multicycle ();
     end
   end
 
-  //   parameter BYTE = 8;
-  initial begin : sim
+  initial begin : add_sim
     integer i;
     clk <= 0;
     pc.dataOut <= programMemStart;
     control.state <= CS.INSTRUCTION_FETCH;
 
-    $readmemh("./memory/program.mem", ram.ram_memory, programMemStart, programMemStart + 5 * 4 - 1);
-    $readmemh("./memory/data.mem", ram.ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
+    $readmemh("./memory/add_program.mem", ram.ram_memory, programMemStart, programMemStart + 5 * 4 - 1);
+    $readmemh("./memory/add_data.mem", ram.ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
     #5;
 
     // load + load + add + store + 1
