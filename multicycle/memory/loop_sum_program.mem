@@ -6,13 +6,13 @@
 //   sum +=i;
 // }
 /*
-          loadi R0 <= 0 //sum //is already initialized to 0 but why not
+          loadi R0 <= 0 //sum 
           loadi R1 <= 0 //i 
           loadi R2 <= 10 //for test expression 
-.loop     bgt R1 > R2 to .finish(pc + 4 + 12)
+.loop     bgt R1 > R2 to .finish(pc + 4 + 12 (bytes))
           add R0+R1 -> R0 
           addi R1+1 -> R1
-          jump .loop (pc + 4 - 16)
+          jump .loop (pc + 4 - 16 (bytes)) 
 .finish   store R0 -> R3(0)
 */
 // assuming all registers start cleared
@@ -20,19 +20,19 @@
 // loadi R0 <= 0
 // 1111 11 | 00 | 0000 0000 0000 
 // opcode  | RD | immediate
-// 000 A0440
+// 000 FC000
 00 0F C0 00 
 
 // loadi R1 <= 0
 // 1111 11 | 01 | 0000 0000 0000 
 // opcode  | RD | immediate
-// 000 A0440
+// 000 FD000
 00 0F D0 00
 
 // loadi R2 <= 10
 // 1111 11 | 10 | 0000 0000 1010 
 // opcode  | RD | immediate
-// 000 A0440
+// 000 E00A
 00 0F E0 0A
 
 // bgt R1 R2 to pc + 1*4 + 3*4 (0x41C)

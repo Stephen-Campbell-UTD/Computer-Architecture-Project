@@ -2,7 +2,8 @@
 `define OPCODES_V 
 module OP ();
 
-  // ALU has bit bit opcode
+  //ALU ops
+  // ALU has 4 bit opcode
   parameter ALU_ADD = 0;
   parameter ALU_SUB = 1;
   parameter ALU_MUL = 2;

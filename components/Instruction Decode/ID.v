@@ -40,16 +40,16 @@ module InstructionDecode (
 
   // Instruction format 2: 2 Register Selections -> 
   // ALU R I Type / Branch  / Load / Store
-  // ASSEMBLY: add rAlpha, rBeta imm  ; rAlpha = rBeta + imm ;
+  // ASSEMBLY: add rAlpha, rBeta imm  ; rAlpha = rBeta + SignExtended(imm) ;
   // ASSEMBLY: branch  rAlpha == rBeta  offset  ; 
-  // A==B ->PC=PC+SignExtended(offset<<2) ;
-  // ASSEMBLY: load rAlpha, rBeta[imm]  ; A = MEM[B + SignExtended(imm)]
-  // ASSEMBLY: store rAlpha, rBeta[imm]  ; MEM[B + SignExtended(imm)] = A
+  // A==B ->PC=PC+SignExtended(offset2 << 2) ;
+  // ASSEMBLY: load rAlpha, rBeta[imm]  ; R[rAlpha] = MEM[R[rBeta] + SignExtended(imm)]
+  // ASSEMBLY: store rBeta, rAlpha[imm]  ; MEM[R[rAlpha] + SignExtended(imm)] = R[rBeta]
   // opcode | rAlpha  | rBeta  | immediate/offset (small)  
   //   6    |    2    |    2   |   10     
 
   // Instruction format 3: Single Register Selection -> Immediate Injection
-  // ASSEMBLY:  loadi rAlpha, imm  ; rAlpha = imm;
+  // ASSEMBLY:  loadi rAlpha, imm  ; R[rAlpha] = SignExtended(imm);
   // opcode | rAlpha  | immediate/offset (big)  
   //   6    |    2    |   12     
 
@@ -57,7 +57,6 @@ module InstructionDecode (
   // ASSEMBLY: jump addr;
   // opcode |  jumpAddress | unused
   //   6    |       9      |    3
-
 
 
 
