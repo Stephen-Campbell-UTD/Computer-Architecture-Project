@@ -6,14 +6,16 @@
 module Control (
     input [5:0] opcode,
     input clk,
+    input reset,
     //12 states -> 4 bits
     output reg [3:0] state
 );
 
 
-  // initial begin
-  //   state <= CS.INSTRUCTION_FETCH;
-  // end
+  always @(posedge reset) begin
+    state <= CS.INSTRUCTION_FETCH; 
+  end
+
 
   always @(posedge clk) begin
     case (state)

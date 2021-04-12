@@ -41,12 +41,11 @@ assign hsCLK = clkCounter[22];// ticks every half second
 assign LED = hsCLK;
 
 
+
 always @(posedge hsCLK) begin
   onesDigit <= onesDigit +2 ;
-  
 end
 
-multicycle
 
 
 endmodule

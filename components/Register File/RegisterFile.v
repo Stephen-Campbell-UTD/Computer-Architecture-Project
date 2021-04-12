@@ -5,6 +5,7 @@ module RegisterFile (
     input [MEM_WORD_SIZE-1:0] writeIn,
     input isReading,
     input clk,
+    input reset,
     output reg [MEM_WORD_SIZE-1:0] outA,
     output reg [MEM_WORD_SIZE-1:0] outB
 );
@@ -15,6 +16,15 @@ module RegisterFile (
   parameter MEM_WORD_SIZE = 64;
 
 
+  always @(posedge clk) begin : regReset
+  integer i ;
+      outA <= 0;
+      outB <= 0;
+  for(i = 0; i < NUM_REG; i = i + 1) begin
+      registers[i] <= 0;
+  end
+
+  end
   //Logic
 
   reg [MEM_WORD_SIZE-1:0] registers[NUM_REG-1:0];

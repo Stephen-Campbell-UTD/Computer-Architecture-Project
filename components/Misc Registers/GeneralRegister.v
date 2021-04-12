@@ -3,9 +3,16 @@ module GenReg #(
 ) (
     input clk,
     input isWriting,
+    input reset,
+    input [WIDTH-1:0] resetData,
     input [WIDTH-1:0] dataIn,
     output reg [WIDTH-1:0] dataOut
 );
+
+
+  always @(posedge reset) begin
+    dataOut <= resetData;
+  end
 
   always @(posedge clk) begin
     if (isWriting) begin

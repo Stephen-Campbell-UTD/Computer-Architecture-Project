@@ -15,7 +15,7 @@
 `include "../components/Left Shift/LeftShift.v"
 `include "../components/ALU/ALU.v"
 
-module Multicycle (input clk);
+module Multicycle (input clk, input reset);
 
   //must keep consistent with ID
   parameter INSTRUCTION_SIZE = 20;
@@ -30,6 +30,7 @@ module Multicycle (input clk);
   //additional params
   parameter ADDRESS_SIZE = 11;
   parameter WORD_SIZE = 64;
+  parameter [ADDRESS_SIZE-1:0] PC_START = 0;
 
   wire [WORD_SIZE-1:0] pc_aluSrcA;
   wire [ADDRESS_SIZE-1:0] pc_memGetDataMux;
@@ -104,6 +105,7 @@ module Multicycle (input clk);
   Control control (
       .opcode(ir_control),
       .clk(clk),
+      .reset(reset),
       .state(controlFSM_controlDecode)
   );
 
@@ -146,6 +148,8 @@ module Multicycle (input clk);
       .WIDTH(INSTRUCTION_SIZE)
   ) instructionRegister (
       .clk(clk),
+      .reset(reset),
+      .resetData({INSTRUCTION_SIZE{1'b0}}),
       .isWriting(irWrite),
       .dataIn(mem_ir),
       .dataOut(ir_out)
@@ -167,6 +171,8 @@ module Multicycle (input clk);
       .WIDTH(64)
   ) memoryDestinationRegister (
       .clk(clk),
+      .reset(reset),
+      .resetData({64{1'b0}}),
       .isWriting(1'b1),
       .dataIn(mem_mdr),
       .dataOut(mdr_regWriteDataMux)
@@ -208,6 +214,7 @@ module Multicycle (input clk);
       .writeIn(regWriteDataMux_regBusWriteData),
       .isReading(~regWrite),  //note the bitwise negation 
       .clk(clk),
+      .reset(reset),
       .outA(regBusA_aluSrcAMux),
       .outB(regBusBOut)
   );
@@ -287,6 +294,8 @@ module Multicycle (input clk);
       .WIDTH(64)
   ) aluOut (
       .clk(clk),
+      .reset(reset),
+      .resetData({64{1'b0}}),
       .isWriting(1'b1),
       .dataIn(alu_aluOut),
       .dataOut(aluOut_dataOut)
@@ -319,10 +328,13 @@ module Multicycle (input clk);
 
   wire [ADDRESS_SIZE-1:0] pc_out;
 
+
   GenReg #(
       .WIDTH(ADDRESS_SIZE)
   ) pc (
       .clk(clk),
+      .reset(reset),
+      .resetData(PC_START),
       .isWriting(pcWriteCombo),
       .dataIn(pcSrcMux_pc),
       .dataOut(pc_out)
