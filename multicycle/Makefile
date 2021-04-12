@@ -1,4 +1,4 @@
-SOURCES = multicycle.v
+SOURCES = multicycle_tb.v
 SIMFILE = main.vcd
 
 

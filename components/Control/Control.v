@@ -11,9 +11,9 @@ module Control (
 );
 
 
-  initial begin
-    state <= CS.INSTRUCTION_FETCH;
-  end
+  // initial begin
+  //   state <= CS.INSTRUCTION_FETCH;
+  // end
 
   always @(posedge clk) begin
     case (state)

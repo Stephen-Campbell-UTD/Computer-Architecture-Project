@@ -20,5 +20,18 @@
       //   "clear": false
       // }
     },
+    {
+      "label": "default run",
+      "type": "shell",
+      "command": "cd \"${relativeFileDirname}\"; make resim",
+      // "presentation": {
+      //   "echo": true,
+      //   "reveal": "never",
+      //   "focus": false,
+      //   "panel": "dedicated",
+      //   "showReuseMessage": true,
+      //   "clear": false
+      // }
+    },
   ]
 }

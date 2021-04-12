@@ -30,17 +30,4 @@ module RegisterFile (
 
 
 
-  //Sim
-  initial begin : initialization
-    integer i;
-    for (i = 0; i < NUM_REG; i = i + 1) begin
-      registers[i] = {MEM_WORD_SIZE{1'b0}};
-    end
-      outA <= {MEM_WORD_SIZE{1'b0}};
-      outB <= {MEM_WORD_SIZE{1'b0}};
-  end
-
-
-
-
 endmodule

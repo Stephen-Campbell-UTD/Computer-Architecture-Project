@@ -13,8 +13,8 @@ module GenReg #(
     end
   end
 
-  initial begin
-    dataOut <= 0;
-  end
+  // initial begin
+  //   dataOut <= 0;
+  // end
 
 endmodule
