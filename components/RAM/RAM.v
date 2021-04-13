@@ -1,6 +1,9 @@
 module RAM (
     input [ADDRESS_SIZE-1:0] address,
+    input [ADDRESS_SIZE-1:0] debugAddress,
+    output reg [7:0] debugOut,
     input isReading,
+    input reset,
     input [MEM_WORD_SIZE-1:0] dataIn,
     output reg [MEM_WORD_SIZE-1:0] dataOut
 );
@@ -12,7 +15,19 @@ module RAM (
   //memory is byte addressed and comes out big endian
   reg [BYTE-1:0] ram_memory[0:MEM_DEPTH-1];
 
-  // assign data = (isReading ? data_private : {MEM_WORD_SIZE{1'bZ}});
+
+  parameter programMemStart = 24;
+  parameter dataMemStart = 0;
+  always @(posedge reset) begin
+    // $readmemh("./memory/add_program.mem", ram_memory, programMemStart, programMemStart + 5 * 4 - 1);
+    // $readmemh("./memory/add_data.mem", ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
+    $readmemh("./memory/debug.mem", ram_memory, 0, 10 * 8 - 1);
+  end
+
+  always @* begin
+    debugOut <= ram_memory[debugAddress];
+  end
+
   always @* begin
     if (isReading) begin
       dataOut <= {

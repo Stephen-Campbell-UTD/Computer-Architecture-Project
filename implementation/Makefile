@@ -20,4 +20,8 @@ $(BUILD_DIR)/%.bin : $(BUILD_DIR)/%.asc
 upload: $(BUILD_DIR)/$(TOP_MOD).bin
 	tinyprog -p  $^
 
+.PHONY : clean
+clean : 
+	trash build/*
+
 

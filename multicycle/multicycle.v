@@ -1,4 +1,4 @@
-`define MULTICYCLE 
+`define MULTICYCLE
 
 `include "./opcodes.v"
 `include "../components/Control/ControlStates.v"
@@ -15,7 +15,13 @@
 `include "../components/Left Shift/LeftShift.v"
 `include "../components/ALU/ALU.v"
 
-module Multicycle (input clk, input reset);
+module Multicycle (
+    input clk,
+    input reset,
+    input [10:0] debugAddress,
+    output [7:0] debugMemOut,
+    output [3:0] controlState
+);
 
   //must keep consistent with ID
   parameter INSTRUCTION_SIZE = 20;
@@ -108,6 +114,7 @@ module Multicycle (input clk, input reset);
       .reset(reset),
       .state(controlFSM_controlDecode)
   );
+  assign controlState = controlFSM_controlDecode;
 
   ControlDecode controlDecode (
       .state(controlFSM_controlDecode),
@@ -134,6 +141,9 @@ module Multicycle (input clk, input reset);
   RAM ram (
       .address(memGetDatMux_memAddress),
       .isReading(memRead),
+      .reset(reset),
+      .debugAddress(debugAddress),
+      .debugOut(debugOut),
       .dataIn(regBusB_memData),
       .dataOut(memDataOut)
   );
