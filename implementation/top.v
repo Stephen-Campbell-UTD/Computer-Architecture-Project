@@ -15,11 +15,10 @@ module top (
     input PIN_7,
     input PIN_8,
 
-    // output PIN_9,
-    // output PIN_10,
-    // output PIN_11,
-    // output PIN_12,
-
+    output PIN_9,
+    output PIN_10,
+    output PIN_11,
+    output PIN_12,
 
     input PIN_13,
 
@@ -31,7 +30,9 @@ module top (
     output PIN_18,
     output PIN_19,
     output PIN_20,
-    output PIN_21
+    output PIN_21,
+
+    output PIN_24
 
 );
 
@@ -60,46 +61,51 @@ module top (
   assign hsCLK = clkCounter[22];  // ticks every half second
 
   wire [10:0] debugAddress;
-  assign debugAddress = {3'b000, PIN_1, PIN_2, PIN_3, PIN_4, PIN_5, PIN_6, PIN_7, PIN_8};
+  // assign debugAddress = {3'b000, PIN_1, PIN_2, PIN_3, PIN_4, PIN_5, PIN_6, PIN_7, PIN_8};
+  assign debugAddress = {3'b000, PIN_8, PIN_7, PIN_6, PIN_5, PIN_4, PIN_3, PIN_2, PIN_1};
 
 
   wire reset;
   assign reset = PIN_13;
 
-  assign LED   = hsCLK || reset;
+  assign LED    = hsCLK || reset;
+  assign PIN_24 = hsCLK;
 
 
   wire [7:0] debugOut;
-  // wire [3:0] controlState;
-  // assign PIN_9  = controlState[0];
-  // assign PIN_10 = controlState[1];
-  // assign PIN_11 = controlState[2];
-  // assign PIN_12 = controlState[3];
+  wire [3:0] controlState;
+  assign PIN_9  = controlState[0];
+  assign PIN_10 = controlState[1];
+  assign PIN_11 = controlState[2];
+  assign PIN_12 = controlState[3];
 
-  // Multicycle mc (
-  //     .clk(hsCLK),
-  //     .reset(reset),
-  //     .debugAddress(debugAddress),
-  //     .debugMemOut(debugOut)
-  //     // .controlState(controlState)
-  // );
-
-  // defparam mc.ram.MEM_DEPTH = 48;
-
-  RAM ram (
+  //control state currently not assigned in multicycle
+  // pcWrite and irWrite are not enabled irl
+  Multicycle mc (
+      .clk(hsCLK),
       .reset(reset),
       .debugAddress(debugAddress),
-      .debugOut(debugOut)
-      // .isReading(1'b1),
-      // .dataOut(dataOut)
+      .debugMemOut(debugOut),
+      .controlState(controlState)
   );
-  defparam ram.MEM_DEPTH = 40;
+
+  defparam mc.ram.MEM_DEPTH = 48;  //
+  defparam[19:0] mc.PC_START = 24;
 
   always @* begin
     onesDigit <= debugOut[3:0];
     tensDigit <= debugOut[7:4];
   end
 
+
+  // RAM ram (
+  //     .reset(reset),
+  //     .debugAddress(debugAddress),
+  //     .debugOut(debugOut)
+  //     // .isReading(1'b1),
+  //     // .dataOut(dataOut)
+  // );
+  // defparam ram.MEM_DEPTH = 40;
 
 
 endmodule

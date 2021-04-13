@@ -1,6 +1,9 @@
 `define MULTICYCLE
 
+`ifndef IMPL
 `include "./opcodes.v"
+`endif
+
 `include "../components/Control/ControlStates.v"
 
 `include "../components/RAM/RAM.v"
@@ -114,7 +117,7 @@ module Multicycle (
       .reset(reset),
       .state(controlFSM_controlDecode)
   );
-  assign controlState = controlFSM_controlDecode;
+  //   assign controlState = controlFSM_controlDecode;
 
   ControlDecode controlDecode (
       .state(controlFSM_controlDecode),
@@ -143,7 +146,7 @@ module Multicycle (
       .isReading(memRead),
       .reset(reset),
       .debugAddress(debugAddress),
-      .debugOut(debugOut),
+      .debugOut(debugMemOut),
       .dataIn(regBusB_memData),
       .dataOut(memDataOut)
   );
@@ -175,6 +178,7 @@ module Multicycle (
   assign ir_signExtendOffset = ir_out[SMALL_IMMEDIATE_SIZE-1:0];
 
 
+  //   assign controlState = {irWrite, pcWrite, 1'b1, 1'b0};
   //Memory Destination Register
 
   GenReg #(
@@ -350,6 +354,7 @@ module Multicycle (
       .dataOut(pc_out)
   );
 
+  //   assign controlState = pc_out[3:0];
   assign pc_aluSrcA = {44'b0, pc_out};
   assign pc_memGetDataMux = pc_out;
 

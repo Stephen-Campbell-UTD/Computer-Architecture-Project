@@ -19,9 +19,9 @@ module RAM (
   parameter programMemStart = 24;
   parameter dataMemStart = 0;
   always @(posedge reset) begin
-    // $readmemh("./memory/add_program.mem", ram_memory, programMemStart, programMemStart + 5 * 4 - 1);
-    // $readmemh("./memory/add_data.mem", ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
-    $readmemh("./memory/debug.mem", ram_memory, 0, 10 * 8 - 1);
+    $readmemh("./memory/add_program.mem", ram_memory, programMemStart, programMemStart + 5 * 4 - 1);
+    $readmemh("./memory/add_data.mem", ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
+    // $readmemh("./memory/debug.mem", ram_memory, 0, 10 * 8 - 1);
   end
 
   always @* begin
