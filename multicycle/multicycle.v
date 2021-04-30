@@ -1,19 +1,19 @@
 `timescale 1ns / 1ps
-`define MULTICYCLE 
+// `define MULTICYCLE
 
-`include "./opcodes.v"
-`include "../components/Control/ControlStates.v"
+`include "ControlStates.vh"
+
 
 `include "../components/RAM/RAM.v"
 `include "../components/Control/Control.v"
-`include "../components/Misc Registers/GeneralRegister.v"
-`include "../components/Register Track Selector/RegisterTrackSelector.v"
-`include "../components/Control Decode/ControlDecode.v"
+`include "../components/Misc_Registers/GeneralRegister.v"
+`include "../components/Register_Track_Selector/RegisterTrackSelector.v"
+`include "../components/Control_Decode/ControlDecode.v"
 `include "../components/Muxes/Mux4.v"
 `include "../components/Muxes/Mux2.v"
-`include "../components/Register File/RegisterFile.v"
-`include "../components/Sign Extender/SignExtender.v"
-`include "../components/Left Shift/LeftShift.v"
+`include "../components/Register_File/RegisterFile.v"
+`include "../components/Sign_Extender/SignExtender.v"
+`include "../components/Left_Shift/LeftShift.v"
 `include "../components/ALU/ALU.v"
 
 module Multicycle ();
@@ -373,16 +373,16 @@ module Multicycle ();
     integer i;
     clk <= 0;
     pc.dataOut <= programMemStart;
-    control.state <= CS.INSTRUCTION_FETCH;
+    control.state <= `INSTRUCTION_FETCH;
 
     $readmemh("./memory/loop_sum_program.mem", ram.ram_memory, programMemStart,
               programMemStart + 8 * 4 - 1);
-    // $readmemh("./memory/loop_sum_data.mem", ram.ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
+    $readmemh("./memory/loop_sum_data.mem", ram.ram_memory, dataMemStart, dataMemStart + 2 * 8 - 1);
     #5;
 
     // (starts at IF ) 3*loadi + branch + add + addi + jump
     // 3*3  + 3 + 4 + 4 + 3 -> 23
-    for (i = 0; i < 170; i = i + 1) begin
+    for (i = 0; i < 171; i = i + 1) begin
       clk <= 1;
       #5;
       clk <= 0;

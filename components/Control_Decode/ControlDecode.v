@@ -1,7 +1,6 @@
-`ifndef MULTICYCLE
-`include "../Control/ControlStates.v"
-`include "../../multicycle/opcodes.v"
-`endif
+`include "opcodes.vh"
+`include "ControlStates.vh"
+
 module ControlDecode (
     input [3:0] state,
     input [5:0] opcode,
@@ -43,7 +42,7 @@ module ControlDecode (
 
   //Instruction Fetch
   always @* begin
-    if (state == CS.INSTRUCTION_FETCH) begin
+    if (state == `INSTRUCTION_FETCH) begin
       pcWrite <= 1;
       pcWriteCond <= 0;
       memGetData <= 0;
@@ -53,7 +52,7 @@ module ControlDecode (
       regWrite <= 0;
       aluSrcA <= aluSrcA_PC;
       aluSrcB <= aluSrcB_4;
-      aluOP <= OP.ALU_ADD;
+      aluOP <= `ALU_ADD;
       pcSrc <= pcSrc_ALU_DIRECT;
     end
   end
@@ -61,7 +60,7 @@ module ControlDecode (
   //Register Fetch
 
   always @* begin
-    if (state == CS.REGISTER_FETCH) begin
+    if (state == `REGISTER_FETCH) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 0;
@@ -71,13 +70,13 @@ module ControlDecode (
       regWrite <= 0;
       aluSrcA <= aluSrcA_PC;
       aluSrcB <= aluSrcB_SE_LS_OFFSET;
-      aluOP <= OP.ALU_ADD;
+      aluOP <= `ALU_ADD;
       pcSrc <= pcSrc_D;
     end
   end
   //Immediate Injection 3
   always @* begin
-    if (state == CS.IMMEDIATE_INJECTION3) begin
+    if (state == `IMMEDIATE_INJECTION3) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 0;  //dont care
@@ -95,7 +94,7 @@ module ControlDecode (
   //ALU R Type Step 3 
 
   always @* begin
-    if (state == CS.ALU_R3) begin
+    if (state == `ALU_R3) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 0;  //dont care
@@ -111,7 +110,7 @@ module ControlDecode (
   end
   //ALU RI Type Step 3 
   always @* begin
-    if (state == CS.ALU_RI3) begin
+    if (state == `ALU_RI3) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 0;  //dont care
@@ -127,7 +126,7 @@ module ControlDecode (
   end
   //ALU Step 4
   always @* begin
-    if (state == CS.ALU4) begin
+    if (state == `ALU4) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 0;  //dont care
@@ -143,7 +142,7 @@ module ControlDecode (
   end
   //Branch Step 3
   always @* begin
-    if (state == CS.BRANCH3) begin
+    if (state == `BRANCH3) begin
       pcWrite <= 0;
       pcWriteCond <= 1;
       memGetData <= 0;  //dont care
@@ -160,7 +159,7 @@ module ControlDecode (
 
   //Memory Ref Step 3
   always @* begin
-    if (state == CS.MEMORY_REF3) begin
+    if (state == `MEMORY_REF3) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 0;  //dont care
@@ -170,13 +169,13 @@ module ControlDecode (
       regWrite <= 0;
       aluSrcA <= aluSrcA_BUSA;
       aluSrcB <= aluSrcB_SE_OFFSET;
-      aluOP <= OP.ALU_ADD;  //dont care
+      aluOP <= `ALU_ADD;  //dont care
       pcSrc <= pcSrc_D;
     end
   end
   //Load Step 4
   always @* begin
-    if (state == CS.LOAD4) begin
+    if (state == `LOAD4) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 1;  //get the data!
@@ -186,13 +185,13 @@ module ControlDecode (
       regWrite <= 0;
       aluSrcA <= aluSrcA_D;
       aluSrcB <= aluSrcB_D;
-      aluOP <= OP.ALU_ADD;  //dont care
+      aluOP <= `ALU_ADD;  //dont care
       pcSrc <= pcSrc_D;
     end
   end
   //Store Step 4
   always @* begin
-    if (state == CS.STORE4) begin
+    if (state == `STORE4) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 1;  //dont care
@@ -208,7 +207,7 @@ module ControlDecode (
   end
   //Load Step 5
   always @* begin
-    if (state == CS.LOAD5) begin
+    if (state == `LOAD5) begin
       pcWrite <= 0;
       pcWriteCond <= 0;
       memGetData <= 0;  //dont care
@@ -224,7 +223,7 @@ module ControlDecode (
   end
   //Jump Step 3
   always @* begin
-    if (state == CS.JUMP3) begin
+    if (state == `JUMP3) begin
       pcWrite <= 1;
       pcWriteCond <= 0;
       memGetData <= 0;  //dont care
@@ -241,16 +240,13 @@ module ControlDecode (
 
 
   always @* begin
-    if ((opcode[5:3] == OP.BRANCH_HEADER) || (opcode[5:2] == {
-          OP.MEMORY_REF_HEADER, 1'b1
+    if ((opcode[5:3] == `BRANCH_HEADER) || (opcode[5:2] == {
+          `MEMORY_REF_HEADER, 1'b1
         })) begin  //branch or store
       regTrackSelect = 1'b1;
     end else begin
       regTrackSelect = 1'b0;
     end
   end
-
-
-
 
 endmodule

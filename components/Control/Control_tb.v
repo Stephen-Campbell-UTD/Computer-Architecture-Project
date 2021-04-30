@@ -1,6 +1,7 @@
 `timescale 1ns / 1ps
 `include "./Control.v"
-`include "../../multicycle/opcodes.v"
+`include "opcodes.vh"
+
 module testbench ();
 
 
@@ -31,7 +32,7 @@ module testbench ();
     // control will be in IF between the beginning of 
     // the 4th clock and end of next clock (35ns to 45ns)
     // IF (0)-> RF (1)-> ALU_R3 (3) -> ALU_4  (5) 
-    opcode <= OP.ADD;
+    opcode <= `ADD;
     #40;
 
     //ALU RI route
@@ -42,7 +43,7 @@ module testbench ();
     // the 4th clock and end of next clock (75ns to 85ns)
     // IF (0)-> RF (1)-> ALU_RI3 (4) -> ALU_4  (5) 
 
-    opcode <= OP.ADDI;
+    opcode <= `ADDI;
     #40;  //80ns
 
     //Branch route
@@ -53,7 +54,7 @@ module testbench ();
     // the 3th clock and end of next clock (105ns to 115ns)
     // IF (0)-> RF (1)-> BRANCH3 (6)
 
-    opcode <= OP.BEQ;
+    opcode <= `BEQ;
     #30;  //110ns
 
     //Load route
@@ -64,7 +65,7 @@ module testbench ();
     // the 5th clock and end of next clock (155ns to 165ns)
     // IF (0)-> RF (1)-> MEMORY_REF3 (7) -> LOAD4 (8) -> LOAD5 (10)
 
-    opcode <= OP.LD;
+    opcode <= `LD;
     #50;  //160ns
 
     //Store route
@@ -74,7 +75,7 @@ module testbench ();
     // control will be in IF between the beginning of 
     // the 4th clock and end of next clock (195ns to 205ns)
     // IF (0)-> RF (1)-> MEMORY_REF3 (7) -> STORE4 (9)
-    opcode <= OP.STR;
+    opcode <= `STR;
     #40;  //200ns
 
     //Jump route
@@ -84,7 +85,7 @@ module testbench ();
     // control will be in IF between the beginning of 
     // the 3rd clock and end of next clock (225ns to 235ns)
     // IF (0)-> RF (1)-> JUMP3 (11)
-    opcode <= OP.JUMP;
+    opcode <= `JUMP;
     #30;  //230ns
 
     //Immediate Injection route
@@ -94,10 +95,9 @@ module testbench ();
     // control will be in IF between the beginning of 
     // the 3rd clock and end of next clock (265ns to 275ns)
     // IF (0)->  IMMEDIATE_INJECTION3(2)
-    opcode <= OP.LDI;
+    opcode <= `LDI;
     #30;  //260ns
     $finish;
   end
-
 
 endmodule

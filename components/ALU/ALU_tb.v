@@ -3,18 +3,15 @@
 
 module testbench ();
 
-
-
-  reg [63:0] A;
-  reg [63:0] B;
-  reg [3:0] op;
+  reg  [63:0] A;
+  reg  [63:0] B;
+  reg  [ 3:0] op;
   wire [63:0] out;
 
-
   ALU uut (
-      .A(A),
-      .B(B),
-      .op(op),
+      .A  (A),
+      .B  (B),
+      .op (op),
       .out(out)
   );
 
